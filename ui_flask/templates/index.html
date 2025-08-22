@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Inventario | Conteo de Galletas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;margin:0;background:#0b0c10;color:#eaf0f1}
+    header,footer{padding:12px 16px;background:#14171a}
+    main{display:grid;grid-template-columns:1fr 280px;gap:16px;padding:16px}
+    .card{background:#111418;border:1px solid #222;border-radius:12px;padding:12px}
+    .btn{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;margin-right:8px}
+    .btn-start{background:#198754;color:#fff}
+    .btn-stop{background:#dc3545;color:#fff}
+    .stat{font-size:14px;color:#aab8c2}
+    .big{font-size:28px;font-weight:700;color:#ffd166}
+    img{width:100%;height:auto;border-radius:12px;border:1px solid #222}
+    .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .pill{background:#1f2329;color:#cbd5e1;border:1px solid #2a2f36;border-radius:999px;padding:6px 10px;font-size:12px}
+  </style>
+</head>
+<body>
+<header class="row">
+  <div class="pill">Modelo: best.pt</div>
+  <div id="status" class="pill">Estado: detenido</div>
+</header>
+
+<main>
+  <div class="card">
+    <img id="video" src="/stream" alt="stream de conteo">
+  </div>
+
+  <aside class="card">
+    <div class="row" style="margin-bottom:8px">
+      <button class="btn btn-start" onclick="startRun()">Iniciar</button>
+      <button class="btn btn-stop"  onclick="stopRun()">Detener</button>
+    </div>
+    <div class="stat">Inicio de sesión</div>
+    <div id="start_time" class="big">-</div>
+    <div class="stat" style="margin-top:12px">Último guardado</div>
+    <div id="last_saved" class="big">-</div>
+    <div class="stat" style="margin-top:12px">Total</div>
+    <div id="total" class="big">0</div>
+  </aside>
+</main>
+
+<footer class="row">
+  <small>Autoguardado al detener • Flask UI mínima</small>
+</footer>
+
+<script>
+  async function startRun(){
+    const r = await fetch('/start', {method:'POST'});
+    const j = await r.json();
+    document.getElementById('status').textContent = j.running ? 'Estado: corriendo' : 'Estado: detenido';
+  }
+  async function stopRun(){
+    const r = await fetch('/stop', {method:'POST'});
+    const j = await r.json();
+    document.getElementById('status').textContent = 'Estado: detenido';
+    if (j.last_saved) document.getElementById('last_saved').textContent = j.last_saved;
+    if (typeof j.total === 'number') document.getElementById('total').textContent = j.total;
+  }
+  async function pullMetrics(){
+    const r = await fetch('/metrics');
+    const j = await r.json();
+    document.getElementById('status').textContent = j.running ? 'Estado: corriendo' : 'Estado: detenido';
+    if (j.start_time) document.getElementById('start_time').textContent = j.start_time;
+    if (j.last_saved) document.getElementById('last_saved').textContent = j.last_saved;
+    if (typeof j.total === 'number') document.getElementById('total').textContent = j.total;
+  }
+  setInterval(pullMetrics, 1000);
+  pullMetrics();
+</script>
+</body>
+</html>

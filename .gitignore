@@ -1,0 +1,24 @@
+# --- Python ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.tmp
+*.swp
+
+# --- Entornos virtuales / IDE ---
+.venv*/
+.env
+.idea/
+.vscode/
+
+# --- Datos y modelos pesados ---
+data/*.mp4
+data/*.mov
+data/*.avi
+data/*.mkv
+outputs/
+
+# --- Otros ---
+*.DS_Store
